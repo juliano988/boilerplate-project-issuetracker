@@ -54,7 +54,7 @@ module.exports = function (app) {
           res.status(200).json(doc)
         });
       } else {
-        res.status(400).json({ error: 'required field(s) missing' });
+        res.status(200).json({ error: 'required field(s) missing' });
       }
     })
 
