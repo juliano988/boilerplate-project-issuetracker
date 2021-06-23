@@ -21,7 +21,6 @@ module.exports = function (app) {
     .get(function (req, res) {
       let project = req.params.project;
       const Issue = mongoose.model(project, issueSchema);
-      console.log(req.query.open !== 'true' && req.query.open !== 'false' ? 'a' : req.query.open === 'true' ? 'b' : 'c')
       Issue.find(Object.assign({
         issue_title: new RegExp(req.query.issue_title, 'i'),
         issue_text: new RegExp(req.query.issue_text, 'i'),
@@ -58,32 +57,62 @@ module.exports = function (app) {
       }
     })
 
-    .put(function (req, res) {
-      if (req.body._id) {
-        if (Object.keys(req.body).length > 1) {
-          let project = req.params.project;
-          const Issue = mongoose.model(project, issueSchema);
+    .put(async function (req, res) {
+      let project = req.params.project;
+      const Issue = mongoose.model(project, issueSchema);
+
+      if (!req.body._id) {
+        return res.status(200).json({ error: 'missing _id' });
+      }
+
+      if (
+        !req.body.issue_title &&
+        !req.body.issue_text &&
+        !req.body.created_by &&
+        !req.body.assigned_to &&
+        !req.body.status_text &&
+        !req.body.open
+      ) {
+        return res.status(200).json({ error: 'no update field(s) sent', '_id': req.body._id });
+      }
+
+      await Issue.findById(req.body._id, function (err, doc) {
+        if (err || !doc) {
+          res.status(200).json({ error: 'could not update', '_id': req.body._id })
+        } else {
           Issue.findByIdAndUpdate(req.body._id, {
             issue_title: req.body.issue_title,
             issue_text: req.body.issue_text,
+            created_by: req.body.created_by,
             assigned_to: req.body.assigned_to,
             status_text: req.body.status_text,
             updated_on: new Date(),
             open: req.body.open === 'false' ? false : true
           }, { new: true, omitUndefined: true }, function (err, doc) {
-            if (err) res.status(500).json({ error: 'could not update', '_id': req.body._id });
+            if (err) res.status(500).json({ message: 'Internal server error' });
             res.status(200).json({ result: 'successfully updated', '_id': req.body._id });
           })
-        }else{
-          res.status(200).json({ error: 'no update field(s) sent', '_id': req.body._id });
         }
-      } else {
-        res.status(200).json({ error: 'missing _id' });
-      }
+      })
     })
 
     .delete(function (req, res) {
       let project = req.params.project;
+      const Issue = mongoose.model(project, issueSchema);
+
+      if (!req.body._id) {
+        return res.status(200).json({ error: 'missing _id' });
+      }
+
+      Issue.findByIdAndDelete(req.body._id, function (err, doc) {
+        if (err) res.status(500).json({ message: 'Internal server error' });
+
+        if (doc) {
+          res.status(200).json({ result: 'successfully deleted', '_id': req.body._id });
+        } else {
+          res.status(200).json({ error: 'could not delete', '_id': req.body._id });
+        }
+      })
 
     });
 
