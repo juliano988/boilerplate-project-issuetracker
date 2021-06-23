@@ -108,9 +108,9 @@ module.exports = function (app) {
         if (err) res.status(500).json({ message: 'Internal server error' });
 
         if (doc) {
-          res.status(200).json({ result: 'successfully deleted', '_id': req.body._id });
+          return res.status(200).json({ result: 'successfully deleted', '_id': req.body._id });
         } else {
-          res.status(200).json({ error: 'could not delete', '_id': req.body._id });
+          return res.status(200).json({ error: 'could not delete', '_id': req.body._id });
         }
       })
 
