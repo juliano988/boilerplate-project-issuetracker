@@ -1,7 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
-mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 
 const issueSchema = new mongoose.Schema({
   issue_title: String,
@@ -59,8 +59,27 @@ module.exports = function (app) {
     })
 
     .put(function (req, res) {
-      let project = req.params.project;
-
+      if (req.body._id) {
+        if (Object.keys(req.body).length > 1) {
+          let project = req.params.project;
+          const Issue = mongoose.model(project, issueSchema);
+          Issue.findByIdAndUpdate(req.body._id, {
+            issue_title: req.body.issue_title,
+            issue_text: req.body.issue_text,
+            assigned_to: req.body.assigned_to,
+            status_text: req.body.status_text,
+            updated_on: new Date(),
+            open: req.body.open === 'false' ? false : true
+          }, { new: true, omitUndefined: true }, function (err, doc) {
+            if (err) res.status(500).json({ error: 'could not update', '_id': req.body._id });
+            res.status(200).json({ result: 'successfully updated', '_id': req.body._id });
+          })
+        }else{
+          res.status(200).json({ error: 'no update field(s) sent', '_id': req.body._id });
+        }
+      } else {
+        res.status(200).json({ error: 'missing _id' });
+      }
     })
 
     .delete(function (req, res) {
