@@ -21,17 +21,25 @@ module.exports = function (app) {
     .get(function (req, res) {
       let project = req.params.project;
       const Issue = mongoose.model(project, issueSchema);
-      Issue.find(Object.assign({
-        issue_title: new RegExp(req.query.issue_title, 'i'),
-        issue_text: new RegExp(req.query.issue_text, 'i'),
-        created_by: new RegExp(req.query.created_by, 'i'),
-        assigned_to: new RegExp(req.query.assigned_to, 'i'),
-        status_text: new RegExp(req.query.status_text, 'i'),
-      }, req.query.open && { open: req.query.open })
-        , function (err, docs) {
+
+      if (req.query._id) {
+        Issue.findById(req.query._id, function (err, doc) {
           if (err) res.status(500).json({ message: 'Internal server error' });
-          res.json(docs)
+          res.json([doc])
         })
+      } else {
+        Issue.find(Object.assign({
+          issue_title: new RegExp(req.query.issue_title, 'i'),
+          issue_text: new RegExp(req.query.issue_text, 'i'),
+          created_by: new RegExp(req.query.created_by, 'i'),
+          assigned_to: new RegExp(req.query.assigned_to, 'i'),
+          status_text: new RegExp(req.query.status_text, 'i'),
+        }, req.query.open && { open: req.query.open })
+          , function (err, docs) {
+            if (err) res.status(500).json({ message: 'Internal server error' });
+            res.json(docs)
+          })
+      }
     })
 
     .post(async function (req, res) {
