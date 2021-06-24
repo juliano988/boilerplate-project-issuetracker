@@ -7,6 +7,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <link rel="stylesheet" href="/public/style.css">
 </head>
 
@@ -19,14 +21,14 @@
       <br>
       <h3>Submit a new issue:</h3>
       <form id="newIssue" method="post" action="/api/">
-        <input type="text" name="issue_title" placeholder="*Title" style="width: 320px; margin-bottom: 3px;"
-          required=''><br>
-        <textarea type="text" name="issue_text" placeholder="*Text" style="width: 320px; height: 100px;"
-          required=''></textarea><br>
-        <input type="text" name="created_by" placeholder="*Created by" style="width: 100px" required=''>
-        <input type="text" name="assigned_to" placeholder="(opt)Assigned to" style="width: 100px">
-        <input type="text" name="status_text" placeholder="(opt)Status text" style="width: 100px"><br>
-        <button type="submit">Submit Issue</button>
+        <input type="text" name="issue_title" placeholder="*Title" required=''><br>
+        <textarea type="text" name="issue_text" placeholder="*Text" required=''></textarea><br>
+        <div class="d-flex">
+          <input type="text" name="created_by" placeholder="*Created by" required=''>
+          <input type="text" name="assigned_to" placeholder="(opt)Assigned to" style="margin: auto 3px;">
+          <input type="text" name="status_text" placeholder="(opt)Status text"><br>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Submit Issue</button>
       </form>
     </div>
 
